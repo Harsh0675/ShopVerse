@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: shopverse
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data","./db:/docker-entrypoint-initdb.d"]
+  api:
+    build: .
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/shopverse
+      JWT_SECRET: change-me-before-production
+      CORS_ORIGIN: "*"
+    ports: ["4000:4000"]
+    depends_on: [db]
+    healthcheck:
+      test: ["CMD","wget","-qO-","http://localhost:4000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  pgdata:
