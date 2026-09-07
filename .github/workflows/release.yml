@@ -26,6 +26,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Generate missing Flutter platform projects
+        run: flutter create --platforms=android .
       - run: flutter pub get
       - run: flutter build apk --release --dart-define=API_BASE_URL=${API_BASE_URL}
       - run: flutter build appbundle --release --dart-define=API_BASE_URL=${API_BASE_URL}
@@ -50,6 +52,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Generate missing Flutter platform projects
+        run: flutter create --platforms=ios .
       - run: flutter pub get
       - name: Build unsigned iOS frameworks
         run: flutter build ios-framework --release --output=build/ios-framework --dart-define=API_BASE_URL=${API_BASE_URL}
@@ -74,6 +78,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Generate missing Flutter platform projects
+        run: flutter create --platforms=linux .
       - run: flutter config --enable-linux-desktop
       - run: flutter pub get
       - run: flutter build linux --release --dart-define=API_BASE_URL=${API_BASE_URL}
@@ -94,6 +100,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Generate missing Flutter platform projects
+        run: flutter create --platforms=windows .
       - run: flutter config --enable-windows-desktop
       - run: flutter pub get
       - run: flutter build windows --release --dart-define=API_BASE_URL=${API_BASE_URL}
@@ -115,6 +123,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Generate missing Flutter platform projects
+        run: flutter create --platforms=macos .
       - run: flutter config --enable-macos-desktop
       - run: flutter pub get
       - run: flutter build macos --release --dart-define=API_BASE_URL=${API_BASE_URL}
