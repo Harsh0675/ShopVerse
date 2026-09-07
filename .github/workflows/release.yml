@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  API_BASE_URL: ${{ vars.API_BASE_URL }}
+
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -16,9 +19,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: {channel: stable}
+      - run: flutter create --platforms=android,ios,windows,linux,macos .
       - run: flutter pub get
-      - run: flutter build apk --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
-      - run: flutter build appbundle --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
+      - run: flutter build apk --release --dart-define=API_BASE_URL=${API_BASE_URL}
+      - run: flutter build appbundle --release --dart-define=API_BASE_URL=${API_BASE_URL}
       - name: Package Android release
         run: |
           mkdir -p release
@@ -37,8 +41,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: {channel: stable}
+      - run: flutter create --platforms=android,ios,windows,linux,macos .
       - run: flutter pub get
-      - run: flutter build ios --release --no-codesign --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
+      - run: flutter build ios --release --no-codesign --dart-define=API_BASE_URL=${API_BASE_URL}
       - run: |
           cd build/ios/iphoneos
           zip -r ../../ShopVerse-${GITHUB_REF_NAME}-ios-unsigned.zip Runner.app
@@ -66,13 +71,26 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: {channel: stable}
+      - run: flutter create --platforms=android,ios,windows,linux,macos .
       - run: flutter config --enable-${{ matrix.target }}-desktop
       - run: flutter pub get
-      - run: flutter build ${{ matrix.target }} --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
+      - run: flutter build ${{ matrix.target }} --release --dart-define=API_BASE_URL=${API_BASE_URL}
+      - name: Package Windows release
+        if: matrix.target == 'windows'
+        shell: pwsh
+        run: |
+          $source = "build\windows\x64\runner\Release"
+          $package = "build\ShopVerse-$env:GITHUB_REF_NAME-windows"
+          New-Item -ItemType Directory -Force -Path $package | Out-Null
+          Copy-Item "$source\*" $package -Recurse -Force
+          Compress-Archive -Path "$package\*" -DestinationPath "build\ShopVerse-$env:GITHUB_REF_NAME-windows.zip" -Force
+          Get-FileHash "build\ShopVerse-$env:GITHUB_REF_NAME-windows.zip" -Algorithm SHA256 | Format-Table -AutoSize
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: mobile/build/${{ matrix.target }}/**/*
+          path: |
+            mobile/build/${{ matrix.target }}/**/*
+            mobile/build/ShopVerse-${{ github.ref_name }}-windows.zip
 
   release:
     needs: [android, ios, desktop]
@@ -83,7 +101,7 @@ jobs:
         with: {path: release-assets}
       - name: Create release package index
         run: |
-          printf '%s\n' "# ShopVerse ${GITHUB_REF_NAME}" "" "Android APK and AAB, iOS unsigned archive, and Windows/Linux/macOS builds are included." > release-assets/RELEASE-CONTENTS.md
+          printf '%s\n' "# ShopVerse ${GITHUB_REF_NAME}" "" "Android APK and AAB, iOS unsigned archive, Windows ZIP package, and Linux/macOS builds are included." > release-assets/RELEASE-CONTENTS.md
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
