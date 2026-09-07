@@ -19,8 +19,16 @@ jobs:
       - run: flutter pub get
       - run: flutter build apk --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
       - run: flutter build appbundle --release --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
+      - name: Package Android release
+        run: |
+          mkdir -p release
+          cp build/app/outputs/flutter-apk/app-release.apk release/ShopVerse-${GITHUB_REF_NAME}-android.apk
+          cp build/app/outputs/bundle/release/app-release.aab release/ShopVerse-${GITHUB_REF_NAME}-android.aab
+          sha256sum release/* > release/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
-        with: {name: android-release, path: mobile/build/app/outputs/**/*}
+        with:
+          name: android-release
+          path: mobile/release/*
 
   ios:
     runs-on: macos-latest
@@ -33,9 +41,11 @@ jobs:
       - run: flutter build ios --release --no-codesign --dart-define=API_BASE_URL=${{ vars.API_BASE_URL }}
       - run: |
           cd build/ios/iphoneos
-          zip -r ../../shopverse-ios-runner.zip Runner.app
+          zip -r ../../ShopVerse-${GITHUB_REF_NAME}-ios-unsigned.zip Runner.app
       - uses: actions/upload-artifact@v4
-        with: {name: ios-release-unsigned, path: mobile/build/shopverse-ios-runner.zip}
+        with:
+          name: ios-release-unsigned
+          path: mobile/build/ShopVerse-${GITHUB_REF_NAME}-ios-unsigned.zip
 
   desktop:
     strategy:
@@ -71,6 +81,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with: {path: release-assets}
+      - name: Create release package index
+        run: |
+          printf '%s\n' "# ShopVerse ${GITHUB_REF_NAME}" "" "Android APK and AAB, iOS unsigned archive, and Windows/Linux/macOS builds are included." > release-assets/RELEASE-CONTENTS.md
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
