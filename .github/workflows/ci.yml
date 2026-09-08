@@ -10,6 +10,7 @@ jobs:
         with: {node-version: 22}
       - run: npm install
       - run: node --check src/server.js
+      - run: npm test
   flutter:
     runs-on: ubuntu-latest
     defaults: {run: {working-directory: mobile}}
