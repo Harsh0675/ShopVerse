@@ -153,4 +153,8 @@ app.get('/api/orders/:id',auth,async(req,res)=>{
   }catch(e){res.status(500).json({error:'Database unavailable'});}
 });
 
-app.listen(process.env.PORT||4000,()=>console.log(`ShopVerse API listening on ${process.env.PORT||4000}`));
+if (require.main === module) {
+  app.listen(process.env.PORT||4000,()=>console.log(`ShopVerse API listening on ${process.env.PORT||4000}`));
+}
+
+module.exports = app;
