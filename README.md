@@ -147,6 +147,16 @@ Override the backend URL with:
 flutter run --dart-define=API_BASE_URL=http://your-server:4000/api
 ```
 
+### 4. Verify the backend
+
+Once the API is running, confirm that the health endpoint responds before launching the client:
+
+```bash
+curl http://localhost:4000/api/health
+```
+
+A successful response confirms that the backend is reachable and ready for the Flutter application.
+
 ## 🧪 Quality & CI
 
 Every push and pull request runs automated checks.
@@ -178,7 +188,7 @@ The automated release pipeline produces native packages for:
 
 **ShopVerse v8.0.0** is the latest published GitHub release, with Android, Windows, Linux, and macOS packages plus SHA-256 checksums.
 
-urlView ShopVerse releaseshttps://github.com/Harsh0675/ShopVerse/releases
+View ShopVerse releases: https://github.com/Harsh0675/ShopVerse/releases
 
 > iOS is not included in automated release packages because deployable iOS builds require Apple signing and provisioning. The other four release targets are unaffected.
 
