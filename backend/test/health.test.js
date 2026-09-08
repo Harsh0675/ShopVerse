@@ -3,9 +3,6 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const { version } = require('../package.json');
 
-process.env.PORT = '0';
-process.env.DATABASE_URL = 'postgresql://invalid:invalid@127.0.0.1:1/shopverse';
-
 const app = require('../src/server');
 
 function request(path) {
@@ -30,8 +27,8 @@ function request(path) {
   });
 }
 
-test('GET /health reports the package version', async () => {
-  const response = await request('/health');
+test('GET /api/health reports the package version', async () => {
+  const response = await request('/api/health');
 
   assert.equal(response.statusCode, 200);
   assert.deepEqual(response.body, {
