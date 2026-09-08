@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
+const { version } = require('../package.json');
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
@@ -28,7 +29,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const sign = u => jwt.sign({ id:u.id,email:u.email,role:u.role }, process.env.JWT_SECRET || 'dev-secret', {expiresIn:'7d'});
 
-app.get('/api/health', (_,res)=>res.json({ok:true,service:'shopverse-api',version:'4.0.0'}));
+app.get('/api/health', (_,res)=>res.json({ok:true,service:'shopverse-api',version}));
 
 app.get('/api/categories', async (_,res)=>{
   try { const r=await pool.query('SELECT category,COUNT(*)::int AS count FROM products GROUP BY category ORDER BY category'); res.json(r.rows); }
