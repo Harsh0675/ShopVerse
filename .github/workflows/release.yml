@@ -136,9 +136,10 @@ jobs:
           path: mobile/ShopVerse-${{ env.RELEASE_VERSION }}-macos.zip
 
   release:
+    # iOS is intentionally excluded here because Apple signing credentials are not configured.
+    # Android, Linux, Windows, and macOS can still publish a complete release.
     needs:
       - android
-      - ios
       - linux
       - windows
       - macos
