@@ -235,6 +235,8 @@ The payment endpoint currently provides a provider configuration foundation and 
 
 Contributions, bug reports, and improvements are welcome.
 
+For the full development workflow, validation checklist, and pull request guidance, see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md).
+
 1. Fork the repository.
 2. Create a feature branch.
 3. Make and test your changes.
